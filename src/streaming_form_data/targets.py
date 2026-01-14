@@ -327,8 +327,7 @@ class DirectoryTarget(BaseTarget):
 
     def on_start(self):
         path = self._prepare_file()
-        if path:
-            self._fd = open(path, self._mode)
+        self._fd = open(path, self._mode)
 
     def on_data_received(self, chunk: bytes):
         if self._fd:
@@ -343,8 +342,7 @@ class DirectoryTarget(BaseTarget):
 
     async def on_start_async(self):
         path = self._prepare_file()
-        if path:
-            self._fd = await aiofiles.open(path, self._mode)
+        self._fd = await aiofiles.open(path, self._mode)
 
     async def on_data_received_async(self, chunk: bytes):
         if self._fd:
