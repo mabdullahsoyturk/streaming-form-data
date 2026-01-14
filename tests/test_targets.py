@@ -409,20 +409,26 @@ def test_csv_upload__incomplete_line_in_the_end_of_chunk__include_partial():
 @pytest.mark.asyncio
 async def test_value_target_basic_async():
     target = ValueTarget()
+
     await target.astart()
     await target.adata_received(b"hello world")
     await target.afinish()
+
     assert target.value == b"hello world"
 
 
 @pytest.mark.asyncio
 async def test_file_target_basic_async():
     filename = os.path.join(tempfile.gettempdir(), "file_async.txt")
+
     target = FileTarget(filename)
+
     await target.astart()
     await target.adata_received(b"hello world")
     await target.afinish()
+
     assert os.path.exists(filename)
+
     with open(filename, "rb") as file_:
         assert file_.read() == b"hello world"
 
@@ -432,11 +438,15 @@ async def test_directory_target_basic_async():
     directory_path = tempfile.gettempdir()
     target = DirectoryTarget(directory_path)
     target.multipart_filename = "file001_async.txt"
+
     await target.astart()
     await target.adata_received(b"first file")
     await target.afinish()
+
     path = os.path.join(directory_path, "file001_async.txt")
+
     assert os.path.exists(path)
+
     with open(path, "rb") as file_:
         assert file_.read() == b"first file"
 
@@ -450,24 +460,30 @@ async def test_s3_upload_async(mock_client):
         "wb",
         transport_params={"client": mock_client},
     )
+
     await target.astart()
     await target.adata_received(b"my test file")
     await target.afinish()
+
     resp = (
         mock_client.get_object(Bucket=BUCKET_NAME, Key=test_key)["Body"]
         .read()
         .decode("utf-8")
     )
+
     assert resp == "my test file"
 
 
 @pytest.mark.asyncio
 async def test_csv_upload_async():
     target = CSVTarget()
+
     await target.astart()
     await target.adata_received(b"name,age\nBob,20\nAli")
+
     assert target.get_lines() == ["name,age", "Bob,20"]
     assert target.get_lines(include_partial_line=True) == ["name,age", "Bob,20", "Ali"]
+
     await target.afinish()
 
 
@@ -494,6 +510,7 @@ class CustomAsyncTarget(BaseTarget):
 async def test_custom_target_basic_async():
     target = CustomAsyncTarget()
     target.multipart_filename = "file.txt"
+
     await target.astart()
     await target.adata_received(b"chunk1")
     await target.adata_received(b"chunk2")
