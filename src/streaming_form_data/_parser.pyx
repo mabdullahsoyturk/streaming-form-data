@@ -232,7 +232,6 @@ cdef class _Parser:
 
     # Combined loop runner (Handles Sync/Async dispatch)
     def _run_loop(self, bytes data, bint is_async):
-        print(data)
         if not data:
             return 0
 
