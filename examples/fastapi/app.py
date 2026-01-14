@@ -1,6 +1,7 @@
 import os
 import tempfile
 import time
+import uvicorn
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
@@ -9,6 +10,7 @@ from streaming_form_data import StreamingFormDataParser
 from streaming_form_data.targets import FileTarget, ValueTarget
 
 app = FastAPI()
+
 
 @app.get("/")
 async def index():
@@ -42,7 +44,7 @@ async def upload(request: Request):
     # Define targets
     # ValueTarget keeps the data in memory
     name_target = ValueTarget()
-    
+
     # FileTarget streams data to disk using aiofiles (when called asynchronously)
     file_target = FileTarget(filepath)
 
@@ -65,7 +67,7 @@ async def upload(request: Request):
         <head><title>Upload Successful</title></head>
         <body>
             <h2>Upload Successful!</h2>
-            <p><strong>Name:</strong> {name_target.value.decode('utf-8')}</p>
+            <p><strong>Name:</strong> {name_target.value.decode("utf-8")}</p>
             <p><strong>Saved File:</strong> {file_target.multipart_filename}</p>
             <p><strong>Local Path:</strong> {filepath}</p>
             <br>
@@ -75,7 +77,7 @@ async def upload(request: Request):
     """
     return HTMLResponse(content=content)
 
+
 if __name__ == "__main__":
-    import uvicorn
     print("Listening on http://localhost:8000")
     uvicorn.run(app, host="127.0.0.1", port=8000)
