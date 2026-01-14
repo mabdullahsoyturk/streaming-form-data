@@ -232,6 +232,7 @@ cdef class _Parser:
 
     # Combined loop runner (Handles Sync/Async dispatch)
     def _run_loop(self, bytes data, bint is_async):
+        print(data)
         if not data:
             return 0
 
@@ -266,7 +267,7 @@ cdef class _Parser:
             elif action == ACT_EMIT_BODY:
                 if self.active_part:
                     if is_async:
-                        return self._await_action(self.active_part.adata_received(self._emit_data), chunk, index, buffer_start, is_async=True)
+                        return self._await_action(self.active_part.adata_received(self._emit_data), chunk, index, buffer_start)
                     else:
                         self.active_part.data_received(self._emit_data)
                 self._emit_data = None
@@ -274,14 +275,14 @@ cdef class _Parser:
             elif action == ACT_PART_START:
                 if self.active_part:
                     if is_async:
-                        return self._await_action(self.active_part.astart(), chunk, index, buffer_start, is_async=True)
+                        return self._await_action(self.active_part.astart(), chunk, index, buffer_start)
                     else:
                         self.active_part.start()
             
             elif action == ACT_PART_END:
                 if self.active_part:
                     if is_async:
-                        return self._await_action(self.active_part.afinish(), chunk, index, buffer_start, is_async=True)
+                        return self._await_action(self.active_part.afinish(), chunk, index, buffer_start)
                     else:
                         self.active_part.finish()
                     self.active_part = None
@@ -289,7 +290,7 @@ cdef class _Parser:
             elif action == ACT_ERROR:
                 if self.active_part:
                     if is_async:
-                        return self._await_action(self.active_part.afinish(), chunk, index, buffer_start, is_async=True)
+                        return self._await_action(self.active_part.afinish(), chunk, index, buffer_start)
                     else:
                         self.active_part.finish()
                 return self._get_error_code()
@@ -297,7 +298,7 @@ cdef class _Parser:
         return 0
 
     # Helper for async recursion to keep the loop going after an await
-    async def _await_action(self, coro, bytes chunk, size_t index, size_t buffer_start, bint is_async):
+    async def _await_action(self, coro, bytes chunk, size_t index, size_t buffer_start):
         await coro
         self._emit_data = None # Clear data if it was used
         
