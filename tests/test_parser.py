@@ -921,7 +921,6 @@ def test_regex_matches():
     encoder = MultipartEncoder(fields={"value": "hello world"})
 
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
-    #parser.register("value", target)
     parser.register("val.*", target, re.fullmatch)
 
     parser.data_received(encoder.to_string())
@@ -937,7 +936,6 @@ def test_regex_not_matches():
     encoder = MultipartEncoder(fields={"VALUE": "hello world"})
 
     parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
-    #parser.register("value", target)
     parser.register("val.*", target, re.fullmatch)
 
     parser.data_received(encoder.to_string())
