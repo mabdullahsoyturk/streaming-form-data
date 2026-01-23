@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v1.20.0
+- Add regular expression based name matching (thanks [@yyweiss])
+
 ## v1.19.1
 - Switch project to uv
 
@@ -174,14 +177,15 @@
 ## v0.3.0
 - Initial release
 
-[@NteRySin]: https://github.com/NteRySin
-[@Wouterkoorn]: https://github.com/Wouterkoorn
 [@gabrielcedran]: https://github.com/gabrielcedran
 [@hbusul]: https://github.com/hbusul
 [@ibrewster]: https://github.com/ibrewster
 [@jasopolis]: https://github.com/jasopolis
 [@kolomenkin]: https://github.com/kolomenkin
 [@mephi42]: https://github.com/mephi42
+[@NteRySin]: https://github.com/NteRySin
 [@raethlein]: https://github.com/raethlein
 [@remram44]: https://github.com/remram44
 [@tokicnikolaus]: https://github.com/tokicnikolaus
+[@Wouterkoorn]: https://github.com/Wouterkoorn
+[@yyweiss]: https://github.com/yyweiss
