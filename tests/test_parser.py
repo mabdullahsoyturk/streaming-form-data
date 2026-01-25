@@ -1,6 +1,7 @@
 from io import BytesIO
 import hashlib
 import os
+import re
 
 import pytest
 from requests_toolbelt import MultipartEncoder
@@ -914,6 +915,36 @@ def test_leading_crlf():
     parser.data_received(b"\r\n\r\n" + encoder.to_string())
 
     assert target.value == b"hello world"
+
+
+def test_regex_matches():
+    target = ValueTarget()
+
+    encoder = MultipartEncoder(fields={"value": "hello world"})
+
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    parser.register("val.*", target, re.fullmatch)
+
+    parser.data_received(encoder.to_string())
+
+    assert target.value == b"hello world"
+    assert target._started
+    assert target._finished
+
+
+def test_regex_not_matches():
+    target = ValueTarget()
+
+    encoder = MultipartEncoder(fields={"VALUE": "hello world"})
+
+    parser = StreamingFormDataParser(headers={"Content-Type": encoder.content_type})
+    parser.register("val.*", target, re.fullmatch)
+
+    parser.data_received(encoder.to_string())
+
+    assert target.value == b""
+    assert not target._started
+    assert not target._finished
 
 
 @pytest.mark.asyncio

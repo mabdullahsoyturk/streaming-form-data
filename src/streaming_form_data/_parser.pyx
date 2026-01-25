@@ -1,5 +1,7 @@
 # cython: language_level=3
 
+from operator import eq
+
 from email.policy import HTTP
 from email.parser import Parser
 
@@ -104,10 +106,12 @@ cdef class Part:
 
     cdef public str name
     cdef list targets
+    cdef public object matches
 
-    def __init__(self, str name, object target):
+    def __init__(self, str name, object target, object matches=None):
         self.name = name
         self.targets = [target]
+        self.matches = matches or eq
 
     def add_target(self, object target):
         self.targets.append(target)
@@ -200,13 +204,13 @@ cdef class _Parser:
         self.strict = strict
         self.unexpected_part_name = ''
 
-    def register(self, str name, object target):
+    def register(self, str name, object target, object matches=None):
         part = self._part_for(name)
 
         if part:
             part.add_target(target)
         else:
-            self.expected_parts.append(Part(name, target))
+            self.expected_parts.append(Part(name, target, matches))
 
     # Helper to setup active part (called internally during scan)
     cdef _set_active_part(self, part, str filename):
@@ -214,9 +218,9 @@ cdef class _Parser:
         self.active_part.set_multipart_filename(filename)
         # We don't call start() here, we let the caller do it based on return action
 
-    cdef _part_for(self, str name):
+    cdef _part_for(self, str name, bint exact=True):
         for part in self.expected_parts:
-            if part.name == name:
+            if exact and part.name == name or part.matches(part.name, name):
                 return part
 
     def data_received(self, bytes data):
@@ -430,7 +434,7 @@ cdef class _Parser:
                     name = params.get('name')
 
                     if name:
-                        part = self._part_for(name)
+                        part = self._part_for(name, exact=False)
                         if part is None:
                             part = self.default_part
                             if self.strict:

@@ -32,9 +32,9 @@ headers = {'Content-Type': 'multipart/form-data; boundary=boundary'}
 
 parser = StreamingFormDataParser(headers=headers)
 
-parser.register('name', ValueTarget())
-parser.register('file', FileTarget('/tmp/file.txt'))
-parser.register('discard', NullTarget())
+parser.register("name", ValueTarget())
+parser.register("file", FileTarget("/tmp/file.txt"))
+parser.register("discard", NullTarget())
 
 for chunk in request.body:
      parser.data_received(chunk)
@@ -68,10 +68,10 @@ follows.
 
 ```python
 name_target = ValueTarget()
-file_target = FileTarget('/tmp/file.dat')
+file_target = FileTarget("/tmp/file.dat")
 
-parser.register('name', name_target)
-parser.register('file', file_target)
+parser.register("name", name_target)
+parser.register("file", file_target)
 ```
 
 Registering multiple targets for the same field is also supported.
@@ -80,12 +80,25 @@ Registering multiple targets for the same field is also supported.
 name_target = ValueTarget()
 sha256_target = SHA256Target()
 
-parser.register('file', name_target)
-parser.register('file', sha256_target)
+parser.register("file", name_target)
+parser.register("file", sha256_target)
 ```
 
 In this case, the contents of the `file` field would be streamed to both `ValueTarget`
 and `SHA256Target`.
+
+Registering targets using regular expression based name matching is also supported.
+
+```python
+import re
+
+target = ValueTarget()
+
+parser.register("val*", target, re.fullmatch)
+```
+
+In this case, the contents of all the inputs where the name matches the given regular
+expression will be streamed to the given `ValueTarget`.
 
 ### 3. Streaming data
 
@@ -126,7 +139,7 @@ target = ValueTarget()
 `FileTarget` objects stream the contents to a file on disk.
 
 ```python
-target = FileTarget('/tmp/file.txt')
+target = FileTarget("/tmp/file.txt")
 ```
 
 #### `DirectoryTarget`
@@ -135,7 +148,7 @@ target = FileTarget('/tmp/file.txt')
 be picked from the `Content-Disposition` header.
 
 ```python
-target = DirectoryTarget('/tmp/uploads/')
+target = DirectoryTarget("/tmp/uploads/")
 ```
 
 #### `SHA256Target`
